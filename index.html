@@ -1,0 +1,849 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <link rel="stylesheet" href="style.css" />
+    <script
+      src="https://api-maps.yandex.ru/2.1/?lang=ru_RU&apikey=b74c1300-f66e-46c1-af8e-b9dcedd27228"
+      type="text/javascript"
+    ></script>
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+      rel="stylesheet"
+    />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+  </head>
+
+  <body>
+    <div class="video-background">
+      <video autoplay muted loop id="bg-video">
+        <!-- <source src="img/Gen-3 Alpha Turbo 2343022229, A storm is raging in, Flux_Dev_a_lush_3d_r, M 5.mp4" type="video/mp4"> -->
+        <!-- <source
+          src="img/Gen-3 Alpha Turbo 4093479149, The branches of the , Flux_Dev_a_lush_3d_r, M 5.mp4"
+          type="video/mp4"
+        > -->
+        <source src="video.webm" type="video/webm" />
+        Ваш браузер не поддерживает видео.
+      </video>
+    </div>
+
+    <!-- /* -------------------------------------------------------------timer------------------------------------------------------------- */ -->
+  <!-- Основное модальное окно таймера -->
+  <div class="modal-timer-overlay" id="modalTimerOverlay"></div>
+  <div class="modal-timer" id="modalTimer">
+      <button class="modal-timer-close" id="modalTimerClose">×</button>
+      <div class="modal-timer-content">
+          <h2>Специальное предложение!</h2>
+          <p>При бронировании сейчас получите скидку <strong>8%</strong></p>
+          <div class="modal-timer-main">
+              <span class="modal-timer-title">До конца акции осталось:</span>
+              <div class="modal-timer-count" id="modalTimerCount">00:00:00:00</div>
+          </div>
+      </div>
+  </div>
+  
+  <!-- Миниатюрный таймер -->
+  <div class="modal-timer-mini" id="modalTimerMini">
+      <button class="modal-timer-minimize" id="modalTimerMinimize">−</button>
+      <div class="modal-timer-mini-count" id="modalTimerMiniCount">00:00:00:00</div>
+  </div>
+  
+  <!-- Кнопка восстановления таймера -->
+  <button class="modal-timer-restore" id="modalTimerRestore">+</button>
+    <!-- /* -------------------------------------------------------------timer------------------------------------------------------------- */ -->
+
+    <!-- /* -------------------------------------------------------------header------------------------------------------------------------- */ -->
+    <header>
+      <img src="img/иконки/ES2.png" alt="" />
+      <a href="#container_slider_css">Главная</a>
+      <a href="#abouts">Характеристика</a>
+      <a href="#genplan">План</a>
+      <a href="#gallerya">Фотоальбом</a>
+      <a href="#review-containers">Отзывы</a>
+      <a href="#kompania">О нас</a>
+      <a href="#mapi">Карта</a>
+      <button class="Authorization" id="authButton">Авторизация</button>
+      <button class="Logout" id="logoutButton" style="display: none">Выйти</button>
+      <div id="authState" data-is-admin="false" style="display:none;"></div>
+    </header>
+
+    <!-- Модальное окно авторизации -->
+    <div id="auth-modal" class="auth-modal">
+      <div class="auth-modal-content">
+        <span class="auth-modal-close">&times;</span>
+        <h2>Авторизация</h2>
+        <form id="auth-login-form" action="login.php" method="POST">
+          <input
+            type="text"
+            id="auth-login-number"
+            name="loginNumber"
+            placeholder="Номер телефона"
+            autocomplete="tel"
+            required
+          />
+          <input
+            type="password"
+            id="auth-login-password"
+            name="loginPassword"
+            placeholder="Пароль"
+            autocomplete="current-password"
+            required
+          />
+          <button type="submit">Войти</button>
+        </form>
+        <button id="auth-show-register-form">Зарегистрироваться</button>
+      </div>
+    </div>
+
+    <!-- Модальное окно регистрации -->
+    <div id="auth-register-modal" class="auth-modal">
+      <div class="auth-modal-content">
+        <span class="auth-modal-close">&times;</span>
+        <h2>Регистрация</h2>
+        <form id="auth-register-form" action="register.php" method="POST">
+          <input
+            type="text"
+            id="auth-register-name"
+            name="registerName"
+            placeholder="Имя"
+            autocomplete="name"
+            required
+            pattern="[A-Za-zА-Яа-яЁё]+"
+            title="Имя должно содержать только буквы"
+          />
+          <input
+            type="text"
+            id="auth-register-surname"
+            name="registerSurname"
+            placeholder="Фамилия"
+            autocomplete="family-name"
+            required
+            pattern="[A-Za-zА-Яа-яЁё]+"
+            title="Фамилия должна содержать только буквы"
+          />
+          <input
+            type="text"
+            id="auth-register-patronymic"
+            name="registerPatronymic"
+            placeholder="Отчество (если есть)"
+            autocomplete="additional-name"
+            pattern="[A-Za-zА-Яа-яЁё]+"
+            title="Отчество должно содержать только буквы"
+          />
+          <input
+            type="text"
+            id="auth-register-number"
+            name="registerNumber"
+            placeholder="Номер телефона"
+            autocomplete="tel"
+            required
+            pattern="\+[0-9]{1,13}"
+            title="Номер телефона должен начинаться с + и содержать до 13 цифр"
+          />
+          <div class="password-container">
+            <input
+              type="password"
+              id="auth-register-password"
+              name="registerPassword"
+              placeholder="Пароль"
+              autocomplete="new-password"
+              required
+            />
+            <button type="button" id="toggle-password">Показать</button>
+          </div>
+          <button type="submit">Зарегистрироваться</button>
+        </form>
+        <button id="auth-show-login-form">Уже есть аккаунт? Войти</button>
+      </div>
+    </div>
+    <!-- /* -------------------------------------------------------------header------------------------------------------------------------- */ -->
+
+    <!-- /* -------------------------------------------------------------slider------------------------------------------------------------- */ -->
+    <div class="container_slider_css" id="container_slider_css">
+      <div class="Name">
+        <h1 id="abouts">EARTH & SKY</h1>
+      </div>
+      <img
+        class="photo_slider_css"
+        src="img/shift-moskva-jk-2272336479-10.png"
+        alt=""
+      />
+      <img
+        class="photo_slider_css"
+        src="img/shift-moskva-jk-2272336521-10.jpg"
+        alt=""
+      />
+      <img
+        class="photo_slider_css"
+        src="img/shift-moskva-jk-2272336534-10.png"
+        alt=""
+      />
+      <img
+        class="photo_slider_css"
+        src="img/shift-moskva-jk-2272336544-10.jpg"
+        alt=""
+      />
+      <img
+        class="photo_slider_css"
+        src="img/shift-moskva-jk-2272336799-10.jpg"
+        alt=""
+      />
+      <img
+        class="photo_slider_css"
+        src="img/shift-moskva-jk-2272336826-10.jpg"
+        alt=""
+      />
+    </div>
+    <!-- /* -------------------------------------------------------------slider------------------------------------------------------------- */ -->
+
+    <!-- /* -------------------------------------------------------------about------------------------------------------------------------- */       -->
+    <div class="about" id="abouts">
+      <div class="spetification">
+        <img src="img/иконки/free-icon-house-key-8121206.png" alt="" />
+        <div class="text-block">
+          Срок сдачи <br />
+          <span>2027</span>
+        </div>
+      </div>
+      <div class="spetification">
+        <img src="img/иконки/free-icon-star-4032782.png" alt="" />
+        <div class="text-block">
+          Класс <br />
+          <span>Премиум</span>
+        </div>
+      </div>
+      <div class="spetification">
+        <img src="img/иконки/free-icon-staircase-2634511.png" alt="" />
+        <div class="text-block">
+          Этажность <br />
+          <span>18</span>
+        </div>
+      </div>
+      <br />
+      <div class="spetification">
+        <img src="img/иконки/free-icon-building-390758.png" alt="" />
+        <div class="text-block">
+          Статус помещений <br />
+          <span>Квартиры</span>
+        </div>
+      </div>
+      <div class="spetification">
+        <img src="img/иконки/free-icon-drywall-11321820.png" alt="" />
+        <div class="text-block">
+          Тип дома <br />
+          <span>Монолитный</span>
+        </div>
+      </div>
+      <div class="spetification">
+        <img
+          src="img/иконки/free-icon-height-measurement-17805322.png"
+          alt=""
+        />
+        <div class="text-block">
+          Высота потолков <br />
+          <span>от 3,6 м до 7,92 м</span>
+        </div>
+      </div>
+      <br />
+      <div class="spetification">
+        <img src="img/иконки/free-icon-spatula-535108.png" alt="" />
+        <div class="text-block">
+          Варианты отделки <br />
+          <span>Под ключ</span>
+        </div>
+      </div>
+      <div class="spetification">
+        <img src="img/иконки/free-icon-parking-18063845.png" alt="" />
+        <div class="text-block">
+          Парковка <br />
+          <span>Подземная, гостевая</span>
+        </div>
+      </div>
+    </div>
+    <!-- /* -------------------------------------------------------------about------------------------------------------------------------- */ -->
+
+    <!-- /* -------------------------------------------------------------genplan------------------------------------------------------------- */    -->
+
+<div class="genplan" id="genplan">
+  <svg viewBox="0 0 1920 1080" xmlns="http://www.w3.org/2000/svg">
+      <!-- Фоновое изображение -->
+      <image href="img/5d013314123fe05f5942bb775a72.jpeg" width="100%" height="100%" preserveAspectRatio="xMidYMid slice"/>
+      
+      <!-- Корпус K1 -->
+      <polygon class="building k1" data-corpus="k1" points="806,114,789,120,770,127,753,132,730,141,730,206,733,257,734,309,737,358,738,407,740,457,741,504,744,550,744,598,746,629,781,634,816,640,847,643,848,591,848,541,848,492,846,431,847,348,846,288,846,247,861,241,862,213,876,203,876,197,889,191,890,186,915,173,962,176,964,126,933,122,906,120,881,119,856,118,834,115"
+              fill="transparent" stroke="transparent"/>
+      
+      <!-- Корпус K2 -->
+      <polygon class="building k2" data-corpus="k2" points="1412,156,1402,166,1388,177,1374,189,1371,261,1363,372,1357,479,1349,602,1344,655,1344,721,1348,712,1356,702,1404,709,1450,716,1489,722,1488,741,1531,749,1540,727,1547,713,1554,693,1562,671,1565,628,1574,529,1582,428,1592,321,1596,267,1607,170,1562,165,1520,162,1484,159,1445,157"
+              fill="transparent" stroke="transparent"/>
+      
+      <!-- Корпус K3 (кликабельный) -->
+      <polygon class="building k3 clickable" data-corpus="k3" points="1099,251,1083,260,1065,271,1044,285,1024,300,1023,383,1021,543,1019,700,1018,786,1018,915,1053,923,1092,931,1128,938,1168,948,1203,954,1233,959,1247,932,1261,907,1274,883,1289,855,1292,769,1298,653,1305,536,1310,412,1319,267,1261,262,1196,257,1149,253,1103,249"
+              fill="transparent" stroke="transparent"/>
+      
+      <!-- Корпус K4 (кликабельный) -->
+      <polygon class="building k4 clickable" data-corpus="k4" points="346,174,325,180,306,185,286,192,265,197,243,205,220,210,228,284,236,344,242,402,248,459,255,517,260,571,267,626,271,680,276,731,279,765,280,766,305,770,336,776,370,783,405,787,445,794,466,781,485,768,500,757,517,743,530,733,548,721,546,694,544,642,540,593,537,539,534,486,530,433,526,379,523,321,518,264,515,217,513,189,467,185,432,182,399,179,370,177"
+              fill="transparent" stroke="transparent"/>
+      
+      <!-- Корпус K5 -->
+      <polygon class="building k5" data-corpus="k5" points="916,176,894,187,893,192,880,199,879,206,866,214,866,242,847,247,847,643,848,591,848,541,848,492,846,431,847,348,846,288,849,757,887,764,924,771,962,776,1018,786,1021,699,1022,542,1024,383,1023,299,1044,285,1065,271,1082,259,1098,250,1110,250,1109,217,1096,218,1095,189,1042,185,992,182,955,179,919,176"
+              fill="transparent" stroke="transparent"/>
+      
+      <!-- Маркеры корпусов -->
+      <g class="marker marker-k1" transform="translate(800, 350)">
+          <circle r="20" fill="#0000FF"/>
+          <text fill="white" text-anchor="middle" dy="5" font-size="14" font-weight="bold">K1</text>
+      </g>
+      
+      <g class="marker marker-k2" transform="translate(1455, 450)">
+          <circle r="20" fill="#0000FF"/>
+          <text fill="white" text-anchor="middle" dy="5" font-size="14" font-weight="bold">K2</text>
+      </g>
+      
+      <g class="marker marker-k3" transform="translate(1150, 600)">
+          <circle r="20"  fill="#0000FF"/>
+          <text fill="white" text-anchor="middle" dy="5" font-size="14" font-weight="bold">K3</text>
+      </g>
+      
+      <g class="marker marker-k4" transform="translate(380, 450)">
+          <circle r="22" fill="#0000FF"/>
+          <text fill="white" text-anchor="middle" dy="5" font-size="14" font-weight="bold">K4</text>
+      </g>
+      
+      <g class="marker marker-k5" transform="translate(940, 450)">
+          <circle r="20" fill="#0000FF"/>
+          <text fill="white" text-anchor="middle" dy="5" font-size="14" font-weight="bold">K5</text>
+      </g>
+      
+      <!-- Маркеры S и M -->
+      <g class="marker marker-s" transform="translate(620, 510)">
+          <circle r="15" fill="#0000FF"/>
+          <text fill="white" text-anchor="middle" dy="5" font-size="14" font-weight="bold">S</text>
+      </g>
+      
+      <g class="marker marker-m" transform="translate(720, 760)">
+          <circle r="15" fill="#0000FF"/>
+          <text fill="white" text-anchor="middle" dy="5" font-size="14" font-weight="bold">M</text>
+      </g>
+      
+      <!-- Инфобоксы корпусов -->
+      <foreignObject class="info-box info-k1" x="670" y="140" width="300" height="180">
+          <div xmlns="http://www.w3.org/1999/xhtml" class="info-content">
+              <h1>K1</h1>
+              Сдача в 1 квартале 2027 • 18 этажей<br>
+              <p>Нет квартир в продаже</p>
+          </div>
+      </foreignObject>
+      
+      <foreignObject class="info-box info-k2" x="1320" y="230" width="300" height="180">
+          <div xmlns="http://www.w3.org/1999/xhtml" class="info-content">
+              <h1>K2</h1>
+              Сдача в 2 квартале 2027 • 18 этажей<br>
+              <p>Нет квартир в продаже</p>
+          </div>
+      </foreignObject>
+      
+      <foreignObject class="info-box info-k3" x="1000" y="380" width="300" height="180">
+          <div xmlns="http://www.w3.org/1999/xhtml" class="info-content">
+              <h1>K3</h1>
+              Сдача в 4 квартале 2026 • 18 этажей<br>
+              <p>4 квартиры в продаже</p>
+          </div>
+      </foreignObject>
+      
+      <foreignObject class="info-box info-k4" x="225" y="230" width="300" height="180">
+          <div xmlns="http://www.w3.org/1999/xhtml" class="info-content">
+              <h1>K4</h1>
+              Сдача в 2 квартале 2026 • 18 этажей<br>
+              <p>4 квартиры в продаже</p>
+          </div>
+      </foreignObject>
+      
+      <foreignObject class="info-box info-k5" x="800" y="230" width="300" height="180">
+          <div xmlns="http://www.w3.org/1999/xhtml" class="info-content">
+              <h1>K5</h1>
+              Сдача в 3 квартале 2027 • 18 этажей<br>
+              <p>Нет квартир в продаже</p>
+          </div>
+      </foreignObject>
+      
+      <!-- Инфобоксы для S и M -->
+      <foreignObject class="info-box-min info-s" x="560" y="540" width="150" height="40">
+          <div xmlns="http://www.w3.org/1999/xhtml" class="info-content-min">
+              <p>Учебное заведение</p>
+          </div>
+      </foreignObject>
+      
+      <foreignObject class="info-box-min info-m" x="660" y="790" width="150" height="40">
+          <div xmlns="http://www.w3.org/1999/xhtml" class="info-content-min">
+              <p>Магазин</p>
+          </div>
+      </foreignObject>
+  </svg>
+
+      <!-- Модальное окно с информацией о квартире -->
+      <div class="fullscreen-overlay" id="fullscreenOverlay">
+          <div class="fullscreen-content">
+              <span class="close-btn" onclick="closeFullscreen()">&times;</span>
+              <div class="apartment-container">
+                  <div class="apartment-photo">
+                      <img src="img/квартиры/k4/k4-1.2 (4).png" alt="Фото квартиры" id="apartmentPhoto">
+                  </div>
+                  <div class="apartment-info">
+                      <div class="apartment-switcher">
+                          <button onclick="switchApartment('1k')">1-комн.</button>
+                          <button onclick="switchApartment('2k')">2-комн.</button>
+                          <button onclick="switchApartment('3k')">3-комн.</button>
+                          <button onclick="switchApartment('4k')">4-комн.</button>
+                      </div>
+                      <div class="apartment-header">
+                          <h2 id="apartmentTitle">4-комн. квартира</h2>
+                          <p class="blue-text" id="apartmentSize">132.8 м² • 15/18 этаж</p>
+                      </div>
+                      <div class="apartment-section">
+                          <p><strong id="apartmentSection">Корпус 1</strong> • <span id="apartmentDelivery">Сдача в 2028</span></p>
+                      </div>
+                      <div class="apartment-price">
+                          <p class="main-price" id="apartmentPrice">141 639 168 ₽</p>
+                          <p class="discount-price" id="apartmentDiscountPrice">140 347 984 ₽</p>
+                          <p class="price-per-meter" id="apartmentPricePerMeter">1 046 560 ₽/м²</p>
+                      </div>
+                      <div class="apartment-description">
+                          <p id="apartmentDescription">Описание квартиры...</p>
+                      </div>
+                  </div>
+                  <div class="developer-info">
+                      <img src="img/иконки/photo_2025-03-09_22-19-18.jpg" alt="Логотип застройщика" id="developerLogo">
+                      <p class="developer-name" id="developerName">Keenly Green</p>
+                      <button class="developer-phone" id="developerPhone">+7 (904)-109-09-10</button>
+                  </div>
+              </div>
+          </div>
+      </div>
+
+      <!-- Детальное модальное окно -->
+      <div class="fullscreen-overlay" id="detailsOverlay">
+          <div class="fullscreen-content">
+              <span class="close-btn" onclick="closeDetails()">&times;</span>
+              <div class="details-container">
+                  <h1 id="detailsTitle">Продается 3-комн. квартира, 82.4 м²</h1>
+                  
+                  <!-- Слайдер фотографий -->
+                  <div class="slider-container">
+                      <div class="slider">
+                          <img src="img/plan1.jpg" alt="Фото 1">
+                          <img src="img/plan2.jpg" alt="Фото 2">
+                      </div>
+                      <button class="slider-prev" onclick="prevSlide()">❮</button>
+                      <button class="slider-next" onclick="nextSlide()">❯</button>
+                  </div>
+
+                  <!-- Информация о доме -->
+                  <div class="short-info">
+                      <div class="info-item"><img src="img/иконки/free-icon-maximize-3413667.png" alt=""> Общая площадь <br><p>2.47 га</p></div>
+                      <div class="info-item"><img src="img/иконки/free-icon-parking-18063845.png" alt=""> Парковочных мест <br><p>528</p></div>
+                      <div class="info-item"><img src="img/иконки/free-icon-staircase-2634511.png" alt=""> Этажей <br><p> 18</p></div>
+                      <div class="info-item"><img src="img/иконки/free-icon-house-key-8121206.png" alt=""> Год сдачи <br><p>2028</p></div>
+                      <div class="info-item"><img src="img/иконки/free-icon-house-key-8121206.png" alt=""> Дом <br><p>Не сдан</p></div>
+                      <div class="info-item"><img src="img/иконки/free-icon-spatula-535108.png" alt=""> Отделка <br><p>Под ключ</p></div>
+                  </div>
+
+                  <!-- Колонки с данными -->
+                  <div class="details-columns">
+                    <div class="column">
+                        <h3>О квартире</h3>
+                        <p><strong>Тип жилья:</strong> <span data-detail="type">Новостройка</span></p>
+                        <p><strong>Площадь:</strong> <span data-detail="area">82.4 м²</span></p>
+                        <p><strong>Высота потолков:</strong> <span data-detail="ceiling">3.65 м</span></p>
+                        <p><strong>Вид из окон:</strong> <span data-detail="view">На улицу</span></p>
+                    </div>
+                    <div class="column">
+                        <h3>О доме</h3>
+                        <p><strong>Лифты:</strong> <span data-detail="elevators">2 пассажирских, 1 грузовой</span></p>
+                        <p><strong>Тип дома:</strong> <span data-detail="houseType">Монолитный</span></p>
+                        <p><strong>Парковка:</strong> <span data-detail="parking">Подземная</span></p>
+                    </div>
+                </div>
+
+                  <!-- Слайдер отделки -->
+                  <div class="finishing-slider">
+                      <h3>Отделка квартиры</h3>
+                      <div class="slider">
+                          <!-- <img src="img/finish1.jpg" alt="Отделка 1">
+                          <img src="img/finish2.jpg" alt="Отделка 2"> -->
+                      </div>
+                      <button class="slider-prev" onclick="prevFinishingSlide()">❮</button>
+                      <button class="slider-next" onclick="nextFinishingSlide()">❯</button>
+                  </div>
+
+                  <!-- Блок цены -->
+                  
+              </div>
+              <div class="price-info">
+                      <h2>8 298 000 ₽</h2>
+                      <p class="discount">Скидка 7%</p>
+                      <p class="discount-price"> 7 717 140 ₽</p>
+                      <p class="price-per-meter">180 000 ₽/м²</p>
+                      <button class="contact-developer">Заказать звонок</button>
+                      <button class="reserve">Забронировать</button>
+                  </div>
+          </div>
+      </div>
+  </div>
+
+  <div class="booking-overlay" id="bookingOverlay">
+    <div class="booking-content">
+        <span class="close-btn" onclick="closeBooking()">&times;</span>
+        <h2>Бронирование квартиры</h2>
+
+        <div class="booking-rules">
+            <div class="rule-item">
+                <i class="fas fa-clock"></i>
+                <span>Доступное время: 10:00 - 20:00</span>
+            </div>
+            <div class="rule-item">
+                <i class="fas fa-hourglass-half"></i>
+                <span>Минимальный интервал между бронями: 1.5 часа</span>
+            </div>
+            <div class="rule-item">
+                <i class="fas fa-calendar-day"></i>
+                <span>Максимум 3 брони в день</span>
+            </div>
+        </div>
+
+        <form id="bookingForm">
+            <!-- Скрытые поля для передачи данных -->
+            <input type="hidden" id="bookingCorpus" name="corpus">
+            <input type="hidden" id="bookingApartmentType" name="apartmentType">
+            
+            <div class="form-group">
+                <label for="bookingDate">Дата:*</label>
+                <input type="date" id="bookingDate" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="bookingTime">Время:*</label>
+                <input type="time" id="bookingTime" min="10:00" max="19:30" step="1800" required>
+                <small>Доступные слоты: 10:00, 10:30, 11:00, ..., 19:30</small>
+            </div>
+            
+            <div class="form-group">
+                <label for="fullName">ФИО:*</label>
+                <input type="text" id="fullName" placeholder="Иванов Иван Иванович" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="phone">Телефон:*</label>
+                <input type="tel" id="phone" placeholder="+7 (XXX) XXX-XX-XX" required>
+            </div>
+            
+            <div class="form-actions">
+                <button type="button" class="btn-cancel" onclick="closeBooking()">Отмена</button>
+                <button type="submit" class="btn-submit">Подтвердить бронь</button>
+            </div>
+        </form>
+
+        <div class="confirmation-message" id="confirmationMessage">
+            <div class="message-icon">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <h3>Бронирование подтверждено!</h3>
+            <p>Наш менеджер свяжется с вами для уточнения деталей.</p>
+            <button type="button" class="btn-ok" onclick="closeBooking()">OK</button>
+        </div>
+    </div>
+</div>
+
+
+    <!-- /* -------------------------------------------------------------genplan------------------------------------------------------------- */ -->
+     
+    <!-- /* -------------------------------------------------------------gallery------------------------------------------------------------- */ -->
+    <div class="gallery" id="gallery">
+      <div
+        class="gallery-item"
+        onclick="openModal('finishing', ['img/galery/otdelca/hallway.webp', 'img/galery/otdelca/balcony.webp', 'img/galery/otdelca/bathroom.webp', 'img/galery/otdelca/bedroom.webp', 'img/galery/otdelca/kitcheb.webp', 'img/galery/otdelca/living room.webp', 'img/galery/otdelca/storeroom.webp', 'img/galery/otdelca/wardrobe.webp'], 'Отделка', ['Архитектурное специализируется на инновационном эко дизайне зданий, который не только органично вписывается в окружающую среду, но и становится ее неотъемлемой частью. В EARTH & SKY представлены два варианта отделки на выбор: в теплой и холодной гамме.'])"
+      >
+        <div class="photo" id="review-containers">
+          <img src="img/galery/otdelca/hallway.webp" alt="Отделка" />
+          <div class="overlay">Отделка</div>
+        </div>
+      </div>
+      <div
+        class="gallery-item"
+        onclick="openModal('parking', ['img/galery/arhitect/1.jpg', 'img/galery/arhitect/2.jpg', 'img/galery/arhitect/3.jpg'], 'Архитекрута', ['Внутренняя территория EARTH & SKY представляет собой многофункциональное общественное пространство с ландшафтным двором-парком, детскими и спортивными площадками, а также зонами для отдыха и общения. Дизайн малых архитектурных форм, украшающих приватную территорию проекта, продолжает современную стилистику и подчеркивает индивидуальный характер башен.'])"
+        >
+        <div class="photo">
+          <img src="img/galery/arhitect/1.jpg" alt="Архитекрута" />
+          <div class="overlay">Архитекрута</div>
+        </div>
+      </div>
+      <div
+        class="gallery-item"
+        onclick="openModal('finishing', ['img/galery/strit/1.jpg', 'img/galery/strit/2.jpg', 'img/galery/strit/3.jpg', 'img/galery/strit/4.jpg'], 'Внутренний двор', ['EARTH & SKY — это не просто двор, а настоящий городской оазис. Здесь гармонично сочетаются современный дизайн, комфорт и активный образ жизни: Ландшафтный парк с продуманным озеленением — место, где можно перезагрузиться после рабочего дня. Детские и спортивные площадки для энергии и движения. Уютные зоны отдыха с продуманным благоустройством — идеальная среда для общения и релакса. Малые архитектурные формы выполнены в фирменной стилистике башен EARTH & SKY, добавляя территории индивидуальности и стиля. Это пространство, где каждая деталь работает на ваш комфорт.'])"
+      >
+        <div class="photo">
+          <img src="img/galery/strit/1.jpg" alt="Внутренний двор" />
+          <div class="overlay">Внутренний двор</div>
+        </div>
+      </div>
+      <div
+        class="gallery-item"
+        onclick="openModal('parking', ['img/galery/parling/1.jpeg','img/galery/parling/2.jpeg','img/galery/parling/3.jpeg','img/galery/parling/4.jpeg'], 'Парковка', ['Места для автомобилей, мотоциклов и велосипедов, а также кладовых расположены на двух уровнях подземного паркинга. 528 машиномест, в том числе 130 мест для электромобилей.'])"
+      >
+        <div class="photo">
+          <img src="img/galery/parling/2.jpeg" alt="Парковка" />
+          <div class="overlay">Парковка</div>
+        </div>
+      </div>
+      <div
+        class="gallery-item"
+        onclick="openModal('parking', ['img/galery/exit/lift.webp', 'img/galery/exit/ladder.webp', 'img/galery/exit/flor.webp'], 'Входная группа', [])"
+      >
+        <div class="photo">
+          <img src="img/galery/exit/lift.webp" alt="Входная группа" />
+          <div class="overlay">Входная группа</div>
+        </div>
+      </div>
+    </div>
+
+    <div id="modal-gallery" class="modal-gallery" onclick="closeModal(event)">
+      <div class="modal-content-gallery" onclick="event.stopPropagation()">
+        <button class="close-button" onclick="closeModal(event)">
+          &times;
+        </button>
+        <div class="modal-image-container-gallery">
+          <img id="modal-image-gallery" src="" alt="" />
+          <button id="prev" onclick="prevImage(event)">&#10094;</button>
+          <button id="next" onclick="nextImage(event)">&#10095;</button>
+        </div>
+        <div class="modal-text-gallery">
+          <h2 id="modal-title-gallery"></h2>
+          <p id="modal-description1-gallery"></p>
+          <p id="modal-description2-gallery"></p>
+          <p id="modal-description3-gallery"></p>
+        </div>
+      </div>
+    </div>
+
+    <!-- /* -------------------------------------------------------------gallery------------------------------------------------------------- */ -->
+
+    <!-- /* -------------------------------------------------------------reviews------------------------------------------------------------- */ -->
+    <div class="review-container" id="review-container">
+      <!-- Кнопки выше отзывов -->
+      <div class="buttons-container">
+        <!-- Кнопка "Написать отзыв" больше не нужна здесь, она создается динамически -->
+        <button id="view-all-reviews-btn" class="view-all-reviews-btn">
+          <i class="fas fa-eye"></i> Просмотреть все отзывы
+        </button>
+      </div>
+
+      <!-- Форма для добавления отзыва (скрыта по умолчанию) -->
+      <div id="review-form" class="review-form">
+        <textarea
+          id="review-textarea"
+          placeholder="Напишите ваш отзыв..."
+        ></textarea>
+        <button id="submit-review-btn" class="submit-review-btn">
+          Отправить
+        </button>
+      </div>
+
+      <!-- Отзывы сверху -->
+      <div class="reviews-top">
+        <div class="review">
+          <div class="user-info">
+            <img src="img/иконки/100x100.gif" alt="Аватар" class="avatar" />
+            <div>
+              <span class="username">Иван Иванов</span>
+              <span class="date">10 октября 2023</span>
+            </div>
+          </div>
+          <p class="review-text">
+            ЖК просто супер! Рядом парк, школа, магазины – всё в шаговой доступности. Добираться до центра удобно, а во дворе зелёная зона и детские площадки. Идеальное место для семьи!
+          </p>
+        </div>
+
+        <div class="review" id="kompania">
+          <div class="user-info">
+            <img src="img/иконки/100x100.gif" alt="Аватар" class="avatar" />
+            <div>
+              <span class="username">Мария Петрова</span>
+              <span class="date">5 октября 2023</span>
+            </div>
+          </div>
+          <p class="review-text">
+            Недавно получили ключи – квартира полностью соответствует описанию! Качественная чистовая отделка, всё продумано до мелочей. Заселялись без проблем, дефектов не нашли. Очень довольны!
+          </p>
+        </div>
+      </div>
+
+      <!-- Отзывы снизу -->
+      <div class="reviews-bottom">
+        <div class="review">
+          <div class="user-info">
+            <img src="img/иконки/100x100.gif" alt="Аватар" class="avatar" />
+            <div>
+              <span class="username">Алексей Смирнов</span>
+              <span class="date">1 октября 2023</span>
+            </div>
+          </div>
+          <p class="review-text">
+          Бронировала квартиру онлайн – удобно, прозрачно, без скрытых платежей. Отдельное спасибо за гибкие условия и приятные бонусы! ЖК EARTH & SKY – отличный выбор для жизни!
+          </p>
+        </div>
+
+        <div class="review">
+          <div class="user-info">
+            <img src="img/иконки/100x100.gif" alt="Аватар" class="avatar" />
+            <div>
+              <span class="username">Елена Кузнецова</span>
+              <span class="date">25 сентября 2023</span>
+            </div>
+          </div>
+          <p class="review-text">
+          Очень доволен процессом бронирования! Менеджеры ЖК EARTH & SKY подробно ответили на все вопросы, помогли подобрать оптимальный вариант. Все прошло быстро и без лишних хлопот. Рекомендую!
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Модальное окно для всех отзывов -->
+    <div id="all-reviews-modal" class="modal">
+      <div class="modal-content">
+        <span class="close">&times;</span>
+        
+        <h2>Все отзывы</h2>
+        <div id="all-reviews-list" class="all-reviews-list"></div>
+      </div>
+    </div>
+    
+   
+    <!-- /* -------------------------------------------------------------reviews------------------------------------------------------------- */ -->
+
+    <!-- /* -------------------------------------------------------------kompani------------------------------------------------------------- */ -->
+    <div class="kompani" id="kompani">
+      <div class="kompani-left">
+        <img src="img/иконки/photo_2025-03-09_22-19-18.jpg" alt="Логотип" />
+        <div class="info">
+          <p>Застройщик</p>
+          <h1>Компания Klean Delta</h1>
+          <h3>
+            4,4 <img src="img/иконки/free-icon-star-1828884.png" alt="Звезда" />
+          </h3>
+          <p>618 отзывов</p>
+        </div>
+      </div>
+      <div class="kompani-right">
+        <div class="top">
+          <div class="stat">
+            <h1>2000</h1>
+            <p>год основания</p>
+          </div>
+          <div class="stat" id="mapi">
+            <h1>85</h1>
+            <p>домов сдано<br />в 17 ЖК</p>
+          </div>
+        </div>
+        <div class="text-block">
+          Девелопер Klean Delta — компания с 25-летней историей. В портфеле — 40
+          проектов жилой, коммерческой, социальной и многофункциональной
+          недвижимости в Шалчининкай и Мантвелишки. С 2001 года было...
+        </div>
+        <a href="#" class="more-link">Узнать больше о застройщике</a>
+      </div>
+    </div>
+    <!-- /* -------------------------------------------------------------kompani------------------------------------------------------------- */     -->
+
+    <!-- /* -------------------------------------------------------------map------------------------------------------------------------- */ -->
+    <div id="map" style="width: 1550px; height: 400px">
+      <script type="text/javascript">
+        ymaps.ready(init);
+
+        function init() {
+          // Координаты Калининграда
+          var kaliningradCoordinates = [54.7065, 20.5112];
+
+          var myMap = new ymaps.Map("map", {
+            center: kaliningradCoordinates,
+            zoom: 13, // Увеличенный масштаб для города
+            controls: ["zoomControl", "searchControl"],
+          });
+
+          // Настраиваем поисковый контрол
+          var searchControl = myMap.controls.get("searchControl");
+          searchControl.options.set({
+            provider: "yandex#search",
+          });
+
+          // Пример метки (необязательно)
+          var kaliningradPlacemark = new ymaps.Placemark(
+            kaliningradCoordinates,
+            {
+              hintContent: "Калининград",
+              balloonContent: "Город на Балтийском море",
+            }
+          );
+
+          myMap.geoObjects.add(kaliningradPlacemark); // Добавляем метку на карту
+        }
+      </script>
+    </div>
+    <!-- /* -------------------------------------------------------------map------------------------------------------------------------- */ -->
+
+    <!-- /* -------------------------------------------------------------fotter------------------------------------------------------------- */       -->
+    <div class="fotter" id="fotter">
+      <div class="fotter-left">
+        <div class="test">
+          <div class="test1">
+            <a href="#"><img src="img/иконки/foter/free-icon-telegram-2582606.png" alt=""/></a>
+          </div>
+          <div class="test2">
+            <a href="#"><img src="img/иконки/foter/free-icon-whatsapp-1077055.png" alt=""/></a>
+          </div>
+          <div class="test3">
+            <a href="#"><img src="img/иконки/foter/avito.svg" alt="" /></a>
+          </div>
+        </div>
+        <p>
+          Любая информация представленная на этом сайте,носит <br />
+          исключительно информационный характер и ни при каких условиях <br />
+          не является публичной офертой, определяемой положениями статьи <br />
+          437 ГК РФ.
+        </p>
+        <div class="fotter-left-about">
+          <p>Политика обработки персональных данных</p>
+          <p>Центр клиентской поддержки</p>
+          <p>Разработал сайт - Курило Дамиан</p>
+        </div>
+      </div>
+      <div class="fotter-center">
+        <a href="#container_slider_css">Главная</a>
+        <a href="#abouts">Характеристика</a>
+        <a href="#genplan">План</a>
+        <a href="#gallerya">Фотоальбом</a>
+        <a href="#review-containers">Отзывы</a>
+        <a href="#kompania">О нас</a>
+        <a href="#mapi">Карта</a>
+        
+      </div>
+    </div>
+    <!-- /* -------------------------------------------------------------fotter------------------------------------------------------------- */ -->
+    <!-- https://www.behance.net/gallery/205692281/dizajn-sajta-zhilogo-multikvartala-Landing-page?tracking_source=search_projects|%D0%B6%D0%B8%D0%BB%D0%BE%D0%B9+%D0%BA%D0%BE%D0%BC%D0%BF%D0%BB%D0%B5%D0%BA%D1%81+%D0%BB%D0%B5%D0%BD%D0%B4%D0%B8%D0%BD%D0%B3&l=5 -->
+
+    <!-- -------------------------------------------------------------Все тесты тукт ------------------------------------------------------------- -->
+   
+    <!-- -------------------------------------------------------------Все тесты тукт ------------------------------------------------------------- -->
+    <script src="js/auth.js"></script>
+    <script src="js/admin.js"></script>
+    <script src="js/gallery.js"></script>
+    <script src="js/headerMenu.js"></script>
+    <script src="js/revue.js"></script>
+    <script src="js/genplan.js"></script>
+    <script src="js/timer.js"></script>
+  </body>
+</html>
